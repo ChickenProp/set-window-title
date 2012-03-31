@@ -1,0 +1,18 @@
+Set the title of a window from the command line.
+
+Usage:
+    set-window-title [-id window-id] [-r] new-title
+
+Requires `xwit` and `xprop` to be installed. `xwit` could probably be made
+unnecessary.
+
+If -id is not given, will prompt to select a window by clicking on it. This
+requires `xwininfo`.
+
+If -r is given, will attempt to restart the window manager afterwards. The
+window manager is assumed to be fvwm with the FvwmCommand module set up. fvwm
+seems to need a restart for title changes to take effect; I haven't tried other
+window managers.
+
+After using this, `xwininfo` will report windows as having no name. I'm not sure
+why. `xprop` appears to report everything correctly.

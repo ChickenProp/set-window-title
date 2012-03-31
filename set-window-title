@@ -1,0 +1,41 @@
+#! /usr/bin/python
+# inspired by http://www.linuxjournal.com/article/8005?page=0,2
+
+import argparse
+import subprocess
+import sys
+import re
+
+def get_window_id(*args):
+    """Wait for the user to click a window, then return its id."""
+    out = subprocess.check_output(['xwininfo'] + list(args))
+    idregex = r"^xwininfo: Window id: (0x[\dabcdef]+) "
+    match = re.search(idregex, out, re.MULTILINE)
+    if not match:
+        return None
+    else:
+        winid = match.group(1)
+        return winid
+
+def set_window_title(winid, title):
+    subprocess.check_call(['xwit', '-id', winid, '-name', title])
+    subprocess.check_call(['xprop', '-id', winid,
+                           '-format', '_NET_WM_NAME', '8s',
+                           '-set', '_NET_WM_NAME', title])
+
+def restart_wm():
+    subprocess.check_call(['FvwmCommand', 'Restart'])
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-id', action='store', type=str)
+    parser.add_argument('-r', action='store_true', dest='restart')
+    parser.add_argument('title', action='store', type=str)
+    args = parser.parse_args()
+    winid = args.id or get_window_id()
+    set_window_title(winid, args.title)
+    if args.restart:
+        restart_wm()
+
+if __name__ == "__main__":
+    main()
